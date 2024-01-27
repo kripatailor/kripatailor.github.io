@@ -1,0 +1,51 @@
+// Got assistance from chatgpt and Claude                                                                                  
+  2 import Foundation                                                                                                          
+  3                                                                                                                            
+  4 func main() {                                                                                                              
+  5     let expression = "A & (B | !C)"                                                                                        
+  6     let variables = ["A", "B", "C"]                                                                                        
+  7     let truthTable = evaluaterExpression(expression, variables: variables)                                                 
+  8     printingTruthTable(variables: variables, truthTable: truthTable)                                                       
+  9 }                                                                                                                          
+ 10 func evaluaterExpression(_ expression: String, variables: [String]) -> [Bool] {                                            
+ 11     var truthTable: [Bool] = []                                                                                            
+ 12                                                                                                                            
+ 13     // Generate all possible combinations of variable values                                                               
+ 14     for i in 0..<(1 << variables.count) {                                                                                  
+ 15         var variableValues: [String: Bool] = [:]                                                                           
+ 16                                                                                                                            
+ 17         for (index, variable) in variables.enumerated() {                                                                  
+ 18             variableValues[variable] = (i & (1 << index)) != 0                                                             
+ 19         }                                                                                                                  
+ 20                                                                                                                            
+ 21         // Evaluate the expression for the current variable values                                                         
+ 22         let result = evaluaterBooleanExpression(expression, variableValues: variableValues)                                
+ 23         truthTable.append(result)                                                                                          
+ 24     }                                                                                                                      
+ 25                                                                                                                            
+ 26     return truthTable                                                                                                      
+ 27 }                                                                                                                          
+ 28 func powerSet(_ s: Set<String>) -> Set<Set<String>> {                                                                      
+ 29     if s.isEmpty {                                                                                                         
+ 30         return [Set()]                                                                                                     
+ 31     } else {                                                                                                               
+ 32         let element = s.first!                                                                                             
+ 33         let rest = s.subtracting([element])                                                                                
+ 34         let withoutElement = powerSet(rest)                                                                                
+ 35         let withElement = withoutElement.map { $0.union([element]) }                                                       
+ 36         return withoutElement.union(withElement)                                                                           
+ 37     }                                                                                                                      
+ 38 }                                                                                                                          
+ 39                                                                                                                            
+ 40                                                                                                                            
+ 41 func evaluaterBooleanExpression(_ expression: String, variableValues: [String: Bool]) -> Bool {                            
+ 42     var stack: [Bool] = []                                                                                                 
+ 43     let operators: Set<Character> = ["&", "|", "^", "!"]                                                                   
+ 44                                                                                                                            
+ 45     for char in expression {                                                                                               
+ 46         if let value = variableValues[String(char)] {                                                                      
+ 47             stack.append(value)                                                                                            
+ 48         } else if operators.contains(char) {                                                                               
+ 49             if let operand2 = stack.popLast(), let operand1 = stack.popLast() {                                            
+ 50                 switch char {                                                                                              
+ 51                 case "&":                     
